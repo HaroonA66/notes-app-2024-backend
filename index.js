@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 
 import verifyAcces from "./middleware/authentication.js";
 import connectDB from "./db.js";
@@ -14,6 +15,9 @@ app.use(express.urlencoded({ extended: true }));
 //to get json data in req.body
 app.use(express.json());
 
+// for cors origin
+app.use(cors());
+
 // mongoose.connect("mongodb://localhost:27017/notesDB").then(() => {
 //   console.log("connected to the database");
 // });
@@ -25,7 +29,7 @@ connectDB();
 // });
 
 // <====== Notes list api ======>
-app.get("/getnotes", verifyAcces, async (req, res) => {
+app.get("/getnotes", async (req, res) => {
   let allNotes = await noteModel.find();
   res.json(allNotes);
 });
