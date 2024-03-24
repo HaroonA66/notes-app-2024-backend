@@ -1,8 +1,9 @@
 //  if having issue with mongodb try to whitelist the ip address.
 
-const connectionString =
-  "mongodb+srv://realharoon66:hm1212@cluster0.rex39e2.mongodb.net/notesDB?retryWrites=true&w=majority&appName=Cluster0";
-//  "mongodb://localhost:27017/notesDB";
+// I am using connection uri with my credentials but not pushed on github for security reasons.
+import connectionString from "./connectionString.js";
+
+// const connectionString = "mongodb://localhost:27017/notesDB";
 
 import { mongoose } from "mongoose";
 

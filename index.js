@@ -20,26 +20,9 @@ app.use(express.json());
 
 connectDB();
 
-const list = [
-  {
-    _id: 1,
-    title: "get milk",
-    content: "got to market and buy milk",
-    create_date: "18-march-2024",
-    edit_date: "29-march-2024",
-  },
-  {
-    _id: 2,
-    title: "important data",
-    content: "ali has 3 iphones total price is 245,000",
-    create_date: "11-feb-2024",
-    edit_date: "29-march-2024",
-  },
-];
-
-app.get("/", (req, res) => {
-  res.send("<h1>welcome to my app.</h1>");
-});
+// app.get("/", (req, res) => {
+//   res.send("<h1>welcome to my app.</h1>");
+// });
 
 // <====== Notes list api ======>
 app.get("/getnotes", verifyAcces, async (req, res) => {
