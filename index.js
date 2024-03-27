@@ -29,9 +29,16 @@ connectDB();
 // });
 
 // <====== Notes list api ======>
-app.get("/getnotes", async (req, res) => {
-  let allNotes = await noteModel.find();
-  res.json(allNotes);
+app.post("/getnotes", async (req, res) => {
+  const { status, searchString } = req.body;
+
+  if (status === "trash") {
+    let notesList = await noteModel.find({ status: "trash" });
+    res.json(notesList);
+  } else {
+    let notesList = await noteModel.find({ status: { $ne: "trash" } });
+    res.json(notesList);
+  }
 });
 
 app.post("/getnote", verifyAcces, async (req, res) => {
@@ -65,6 +72,8 @@ app.post("/postnote", verifyAcces, async (req, res) => {
     const newNote = new noteModel({
       title: req.body?.title || "",
       content: req.body?.content || "",
+      status: req.body?.status || "",
+      color: req.body?.color || "",
       create_date: req.body?.create_date || "",
       edit_date: req.body?.edit_date || "",
     });
