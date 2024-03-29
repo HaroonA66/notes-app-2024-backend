@@ -5,7 +5,7 @@ const noteSchema = new mongoose.Schema({
   content: String,
   status: {
     type: String,
-    enum: ['trash', ''], // List allowed values for status
+    enum: ['trash', 'deleted', ''], // List allowed values for status
     default: '', // Set default value to empty string
   },
   edit_date: String,
