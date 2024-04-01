@@ -38,10 +38,7 @@ app.post("/getnotes", async (req, res) => {
   } else {
     // let notesList = await noteModel.find({ status: { $ne: "trash" }});
     let notesList = await noteModel.find({
-      $and: [
-        { status: { $ne: "trash" } },
-        { status: { $ne: "deleted" } }
-      ]
+      $and: [{ status: { $ne: "trash" } }, { status: { $ne: "deleted" } }],
     });
     res.json(notesList);
   }
@@ -72,19 +69,55 @@ app.post("/getnote", verifyAcces, async (req, res) => {
 app.post("/postnote", verifyAcces, async (req, res) => {
   // const { id, title, content, create_date, edit_date } = req.body;
   // console.log(req.body);
-  if (!req.body?.title || !req.body?.content) {
-    res.send({ Message: "title and content should not be missing." });
+
+  if (req?.body?._id) {
+    try {
+      // Find the note by ID
+      const existingNote = await noteModel.findById(req.body._id);
+      const updatedNote = await noteModel.findByIdAndUpdate(
+        req.body._id, // ID of the document to update
+        {
+          title: req.body?.title || existingNote?.title,
+          content: req.body?.content || existingNote?.content,
+          status:
+            req.body.status || req.body.status === ""
+              ? req.body.status
+              : existingNote?.status,
+          color: req.body?.color || existingNote?.color,
+          edit_date:
+            req.body?.title !== existingNote.title ||
+            req.body?.content !== existingNote.title
+              ? new Date()
+              : existingNote?.edit_date, // Update the edit date
+          
+        },
+        { new: true } // Return the updated document
+      );
+
+      res.json(updatedNote);
+    } catch (error) {
+      res.status(500).json({ error: "Error updating note." });
+    }
   } else {
-    const newNote = new noteModel({
-      title: req.body?.title || "",
-      content: req.body?.content || "",
-      status: req.body?.status || "",
-      color: req.body?.color || "",
-      create_date: req.body?.create_date || "",
-      edit_date: req.body?.edit_date || "",
-    });
-    const newResp = await newNote.save();
-    res.json({ newResp });
+    if (!req.body?.title || !req.body?.content) {
+      res.send({ Message: "title and content should not be missing." });
+    } else {
+      const newNote = new noteModel({
+        title: req.body?.title || "",
+        content: req.body?.content || "",
+        status: req.body?.status || "",
+        color: req.body?.color || "",
+        create_date: new Date(),
+        edit_date: req.body?.edit_date || "",
+      });
+
+      try {
+        const newResp = await newNote.save();
+        res.json(newResp);
+      } catch (error) {
+        res.status(500).json({ error: "Error saving new note." });
+      }
+    }
   }
 });
 
