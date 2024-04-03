@@ -35,6 +35,9 @@ app.post("/getnotes", async (req, res) => {
   if (status === "trash") {
     let notesList = await noteModel.find({ status: "trash" });
     res.json(notesList);
+  } else if(status === "all"){
+    let notesList = await noteModel.find();
+    res.json(notesList);
   } else {
     // let notesList = await noteModel.find({ status: { $ne: "trash" }});
     let notesList = await noteModel.find({
