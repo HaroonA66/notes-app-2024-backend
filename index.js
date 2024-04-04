@@ -29,21 +29,61 @@ connectDB();
 // });
 
 // <====== Notes list api ======>
+// app.post("/getnotes", async (req, res) => {
+//   const { status, searchString } = req.body;
+
+//   if (status === "trash") {
+//     let notesList;
+//     if(searchString){
+//       notesList = await noteModel.find({status: "trash", })
+
+//     }else{
+
+//        notesList = await noteModel.find({ status: "trash" });
+//     }
+//     res.json(notesList);
+//   } else if(status === "all"){
+//     let notesList = await noteModel.find();
+//     res.json(notesList);
+//   } else {
+//     // let notesList = await noteModel.find({ status: { $ne: "trash" }});
+//     let notesList = await noteModel.find({
+//       $and: [{ status: { $ne: "trash" } }, { status: { $ne: "deleted" } }],
+//     });
+//     res.json(notesList);
+//   }
+// });
+
 app.post("/getnotes", async (req, res) => {
   const { status, searchString } = req.body;
 
+  let query = { status: { $ne: "deleted" } }; // Start with a base query excluding deleted notes
+
+  // If status is trash, include only trashed notes
   if (status === "trash") {
-    let notesList = await noteModel.find({ status: "trash" });
-    res.json(notesList);
-  } else if(status === "all"){
-    let notesList = await noteModel.find();
-    res.json(notesList);
+    query = { status: "trash" };
+  } else if (status === "all") {
+    query = {};
   } else {
-    // let notesList = await noteModel.find({ status: { $ne: "trash" }});
-    let notesList = await noteModel.find({
+    query = {
       $and: [{ status: { $ne: "trash" } }, { status: { $ne: "deleted" } }],
-    });
+    };
+  }
+
+  // If searchString is provided, add search conditions for title and content
+  if (searchString) {
+    const searchRegex = new RegExp(searchString, "i"); // Case-insensitive regex for searchString
+    query.$or = [
+      { title: { $regex: searchRegex } },
+      { content: { $regex: searchRegex } },
+    ];
+  }
+
+  try {
+    const notesList = await noteModel.find(query);
     res.json(notesList);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while fetching notes" });
   }
 });
 
@@ -92,7 +132,6 @@ app.post("/postnote", verifyAcces, async (req, res) => {
             req.body?.content !== existingNote.title
               ? new Date()
               : existingNote?.edit_date, // Update the edit date
-          
         },
         { new: true } // Return the updated document
       );
