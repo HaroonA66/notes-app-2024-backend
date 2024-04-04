@@ -64,6 +64,8 @@ app.post("/getnotes", async (req, res) => {
     query = { status: "trash" };
   } else if (status === "all") {
     query = {};
+  } else if(status === "deleted"){
+    query = {status: "deleted"}
   } else {
     query = {
       $and: [{ status: { $ne: "trash" } }, { status: { $ne: "deleted" } }],
