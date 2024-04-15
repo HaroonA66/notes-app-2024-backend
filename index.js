@@ -18,9 +18,7 @@ app.use(express.json());
 // for cors origin
 app.use(cors());
 
-// mongoose.connect("mongodb://localhost:27017/notesDB").then(() => {
-//   console.log("connected to the database");
-// });
+
 
 connectDB();
 
@@ -29,32 +27,9 @@ connectDB();
 // });
 
 // <====== Notes list api ======>
-// app.post("/getnotes", async (req, res) => {
-//   const { status, searchString } = req.body;
 
-//   if (status === "trash") {
-//     let notesList;
-//     if(searchString){
-//       notesList = await noteModel.find({status: "trash", })
 
-//     }else{
-
-//        notesList = await noteModel.find({ status: "trash" });
-//     }
-//     res.json(notesList);
-//   } else if(status === "all"){
-//     let notesList = await noteModel.find();
-//     res.json(notesList);
-//   } else {
-//     // let notesList = await noteModel.find({ status: { $ne: "trash" }});
-//     let notesList = await noteModel.find({
-//       $and: [{ status: { $ne: "trash" } }, { status: { $ne: "deleted" } }],
-//     });
-//     res.json(notesList);
-//   }
-// });
-
-app.post("/getnotes", async (req, res) => {
+app.post("/getnotes",verifyAcces, async (req, res) => {
   const { status, searchString } = req.body;
 
   let query = { status: { $ne: "deleted" } }; // Start with a base query excluding deleted notes
