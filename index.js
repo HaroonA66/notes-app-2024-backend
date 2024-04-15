@@ -22,9 +22,9 @@ app.use(cors());
 
 connectDB();
 
-// app.get("/", (req, res) => {
-//   res.send("<h1>welcome to my app.</h1>");
-// });
+app.get("/", (req, res) => {
+  res.send("Backend Server For Notes app 2024 by Haroon.");
+});
 
 // <====== Notes list api ======>
 
