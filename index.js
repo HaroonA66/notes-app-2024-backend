@@ -16,9 +16,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // for cors origin
-app.use(cors());
-
-
+app.use(
+  cors({
+    origin: "https://notes-app-2024-frontend.vercel.app/", // Replace with your frontend origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed request headers
+  })
+);
 
 connectDB();
 
@@ -28,8 +32,7 @@ app.get("/", (req, res) => {
 
 // <====== Notes list api ======>
 
-
-app.post("/getnotes",verifyAcces, async (req, res) => {
+app.post("/getnotes", verifyAcces, async (req, res) => {
   const { status, searchString } = req.body;
 
   let query = { status: { $ne: "deleted" } }; // Start with a base query excluding deleted notes
@@ -39,8 +42,8 @@ app.post("/getnotes",verifyAcces, async (req, res) => {
     query = { status: "trash" };
   } else if (status === "all") {
     query = {};
-  } else if(status === "deleted"){
-    query = {status: "deleted"}
+  } else if (status === "deleted") {
+    query = { status: "deleted" };
   } else {
     query = {
       $and: [{ status: { $ne: "trash" } }, { status: { $ne: "deleted" } }],
