@@ -10,12 +10,6 @@ import "dotenv/config";
 const app = express();
 const PORT = 3050;
 
-// to get params etc. in req.body
-app.use(express.urlencoded({ extended: true }));
-
-//to get json data in req.body
-app.use(express.json());
-
 // for cors origin
 // Restrict to specific origin
 const corsOptions = {
@@ -27,26 +21,28 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// manual headers
+// to get params etc. in req.body
+app.use(express.urlencoded({ extended: true }));
+
+//to get json data in req.body
+app.use(express.json());
+
+// Add explicit CORS handling if needed
 app.use((req, res, next) => {
-  res.header(
+  res.setHeader(
     "Access-Control-Allow-Origin",
     "https://notes-app-2024.vercel.app"
-  ); // Replace with your frontend URL
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
   if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Methods", "PUT, POST, DELETE, GET");
-    return res.status(200).json({});
+    return res.status(204).end(); // Preflight response
   }
   next();
 });
 
 connectDB();
-
-app.options("*", cors()); // Allow preflight requests for all routes
 
 app.get("/", (req, res) => {
   res.send("Backend Server For Notes app 2024 by Haroon.");
