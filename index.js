@@ -17,9 +17,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // for cors origin
-app.use(cors());
+// Restrict to specific origin
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://notes-app-2024.vercel.app"], // Replace with your frontend's deployed URL
+  methods: ["GET", "POST", "DELETE", "PUT"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 connectDB();
+
+app.options("*", cors()); // Allow preflight requests for all routes
 
 app.get("/", (req, res) => {
   res.send("Backend Server For Notes app 2024 by Haroon.");
