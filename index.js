@@ -27,6 +27,23 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// manual headers
+app.use((req, res, next) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://notes-app-2024.vercel.app"
+  ); // Replace with your frontend URL
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "PUT, POST, DELETE, GET");
+    return res.status(200).json({});
+  }
+  next();
+});
+
 connectDB();
 
 app.options("*", cors()); // Allow preflight requests for all routes
