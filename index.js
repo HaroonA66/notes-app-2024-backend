@@ -17,13 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // for cors origin
-app.use(
-  cors({
-    origin: "https://notes-app-2024.vercel.app/", // Replace with your frontend origin
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-    allowedHeaders: ["*"], // Allowed request headers
-  })
-);
+app.use(cors());
 
 connectDB();
 
