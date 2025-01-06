@@ -21,7 +21,7 @@ app.use(
   cors({
     origin: "https://notes-app-2024.vercel.app/", // Replace with your frontend origin
     methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed request headers
+    allowedHeaders: ["*"], // Allowed request headers
   })
 );
 
