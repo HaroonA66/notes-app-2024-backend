@@ -5,6 +5,7 @@ import cors from "cors";
 import verifyAcces from "./middleware/authentication.js";
 import connectDB from "./db.js";
 import noteModel from "./models/note.js";
+import "dotenv/config";
 
 const app = express();
 const PORT = 3050;
