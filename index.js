@@ -18,8 +18,17 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
-
-app.use(cors({ origin: ["*"] }));
+app.options("*", cors());
+app.use(
+  cors({
+    origin: [
+      "*",
+      "64.29.17.129:443",
+      "https://notes-app-2024.vercel.app",
+      "https://notes-app-2024.vercel.app/",
+    ],
+  })
+);
 
 // to get params etc. in req.body
 app.use(express.urlencoded({ extended: true }));
