@@ -19,7 +19,7 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use(cors(corsOptions));
+app.use(cors({ origin: ["*"] }));
 
 // to get params etc. in req.body
 app.use(express.urlencoded({ extended: true }));
@@ -28,19 +28,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Add explicit CORS handling if needed
-app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://notes-app-2024.vercel.app"
-  );
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+// app.use((req, res, next) => {
+//   res.setHeader(
+//     "Access-Control-Allow-Origin",
+//     "https://notes-app-2024.vercel.app"
+//   );
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  if (req.method === "OPTIONS") {
-    return res.status(204).end(); // Preflight response
-  }
-  next();
-});
+//   if (req.method === "OPTIONS") {
+//     return res.status(204).end(); // Preflight response
+//   }
+//   next();
+// });
 
 connectDB();
 
