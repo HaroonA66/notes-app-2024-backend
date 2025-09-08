@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 
 import verifyAcces from "./middleware/authentication.js";
@@ -45,11 +44,16 @@ app.use((req, res, next) => {
   next();
 });
 
-connectDB();
+//   next();
+// });
 
-app.get("/", (req, res) => {
-  res.send("Backend Server For Notes app 2024 by Haroon.");
-});
+// Initialize the application
+const initApp = async () => {
+  await connectDB();
+
+  app.get("/", (req, res) => {
+    res.send("Backend Server For Notes app 2024 by Haroon.");
+  });
 
 // <====== Notes list api ======>
 
@@ -82,7 +86,12 @@ app.post("/getnotes", verifyAcces, async (req, res) => {
 
   try {
     const notesList = await noteModel.find(query);
-    res.json(notesList);
+    // Convert id to _id for compatibility with frontend
+    const notesWithId = notesList.map(note => ({
+      ...note,
+      _id: note.id
+    }));
+    res.json(notesWithId);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while fetching notes" });
   }
@@ -92,14 +101,17 @@ app.post("/getnote", verifyAcces, async (req, res) => {
   const noteId = req.body.noteId;
 
   // Validate noteId format
-  if (!mongoose.isValidObjectId(noteId)) {
+  if (!noteModel.constructor.isValidObjectId(noteId)) {
     return res.status(400).send({ message: "Invalid noteId format" });
   } else {
     try {
       const requestedNote = await noteModel.findById(noteId);
 
       if (requestedNote) {
-        res.json(requestedNote);
+        // Convert id to _id for compatibility with frontend
+        const noteWithId = { ...requestedNote, _id: requestedNote.id };
+        delete noteWithId.id;
+        res.json(noteWithId);
       } else {
         res.send({ message: "There is no record matching this ID." });
       }
@@ -131,13 +143,16 @@ app.post("/postnote", verifyAcces, async (req, res) => {
           edit_date:
             req.body?.title !== existingNote.title ||
             req.body?.content !== existingNote.title
-              ? new Date()
+              ? new Date().toISOString()
               : existingNote?.edit_date, // Update the edit date
         },
         { new: true } // Return the updated document
       );
 
-      res.json(updatedNote);
+      // Convert id to _id for compatibility with frontend
+      const noteWithId = { ...updatedNote, _id: updatedNote.id };
+      delete noteWithId.id;
+      res.json(noteWithId);
     } catch (error) {
       res.status(500).json({ error: "Error updating note." });
     }
@@ -145,18 +160,21 @@ app.post("/postnote", verifyAcces, async (req, res) => {
     if (!req.body?.title || !req.body?.content) {
       res.send({ Message: "title and content should not be missing." });
     } else {
-      const newNote = new noteModel({
+      const noteData = {
         title: req.body?.title || "",
         content: req.body?.content || "",
         status: req.body?.status || "",
         color: req.body?.color || "",
-        create_date: new Date(),
+        create_date: new Date().toISOString(),
         edit_date: req.body?.edit_date || "",
-      });
+      };
 
       try {
-        const newResp = await newNote.save();
-        res.json(newResp);
+        const newResp = await noteModel.save(noteData);
+        // Convert id to _id for compatibility with frontend
+        const noteWithId = { ...newResp, _id: newResp.id };
+        delete noteWithId.id;
+        res.json(noteWithId);
       } catch (error) {
         res.status(500).json({ error: "Error saving new note." });
       }
@@ -168,7 +186,7 @@ app.delete("/deletenote", verifyAcces, async (req, res) => {
   const noteId = req.body.noteId;
 
   // Validate noteId format
-  if (!mongoose.isValidObjectId(noteId)) {
+  if (!noteModel.constructor.isValidObjectId(noteId)) {
     return res.status(400).send({ message: "Invalid noteId format" });
   } else {
     try {
@@ -193,6 +211,10 @@ app.delete("/deletenote", verifyAcces, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening at port: ${PORT}`);
-});
+  app.listen(PORT, () => {
+    console.log(`Server listening at port: ${PORT}`);
+  });
+};
+
+// Start the application
+initApp().catch(console.error);
