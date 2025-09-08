@@ -10,25 +10,21 @@ import "dotenv/config";
 const app = express();
 const PORT = 3050;
 
-// for cors origin
-// Restrict to specific origin
+// CORS configuration
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://notes-app-2024.vercel.app"], // Replace with your frontend's deployed URL
-  methods: ["GET", "POST", "DELETE", "PUT"],
+  origin: [
+    "http://localhost:3000", 
+    "http://localhost:3001", 
+    "https://notes-app-2024.vercel.app"
+  ],
+  methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
+  optionsSuccessStatus: 200 // For legacy browser support
 };
-app.options("*", cors());
-app.use(
-  cors({
-    origin: [
-      "*",
-      "64.29.17.129:443",
-      "https://notes-app-2024.vercel.app",
-      "https://notes-app-2024.vercel.app/",
-    ],
-  })
-);
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
 
 // to get params etc. in req.body
 app.use(express.urlencoded({ extended: true }));
@@ -36,20 +32,18 @@ app.use(express.urlencoded({ extended: true }));
 //to get json data in req.body
 app.use(express.json());
 
-// Add explicit CORS handling if needed
-// app.use((req, res, next) => {
-//   res.setHeader(
-//     "Access-Control-Allow-Origin",
-//     "https://notes-app-2024.vercel.app"
-//   );
-//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+// Add explicit CORS headers for additional compatibility
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
 
-//   if (req.method === "OPTIONS") {
-//     return res.status(204).end(); // Preflight response
-//   }
-//   next();
-// });
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
 
 connectDB();
 
